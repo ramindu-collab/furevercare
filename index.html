@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FureverCare - Pet Care App Services</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Animate.css for animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- AOS for scroll animations -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+     <link href="assets/FureverCare1.png" rel="icon">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f6f9;
+        }
+        .hero {
+            background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), image-set("assets/hero.jpg");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: white;
+            padding: 200px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+            min-height: 100vh;
+            background-color: #4a4e69; /* Fallback color if image fails */
+        }
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 600;
+        }
+        .hero p {
+            animation: bounceIn 1.5s ease-in-out;
+        }
+        .feature-card, .service-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        .feature-card:hover, .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .register-btn {
+            animation: pulse 2s infinite;
+            border-radius: 25px;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .contact-section, .about-section, .services-section {
+            background-color: #fff;
+            border-radius: 15px;
+            padding: 50px 0;
+        }
+        .footer {
+            background-color: #2d3436;
+            color: white;
+            padding: 30px 0;
+        }
+        .footer a {
+            color: #dfe6e9;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            color: #74b9ff;
+        }
+        .cta-section {
+            background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1583511655857-d19b37a7a4d9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+        .testimonial-section {
+            min-height: 300px; /* Ensure visibility */
+        }
+        .navbar-nav .nav-link {
+            transition: color 0.3s ease;
+        }
+        .navbar-nav .nav-link:hover {
+            color: #007bff;
+        }
+    </style>
+    <!-- Firebase SDK (Updated to 10.12.2) -->
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand animate__animated animate__fadeInLeft" href="#">
+                <img src="assets/FureverCare1.png" alt="FureverCare Logo" width="40"> FureverCare
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link animate__animated animate__fadeInRight" href="#home">Home</a></li>
+                    <li class="nav-item"><a class="nav-link animate__animated animate__fadeInRight animate__delay-1s" href="#services">Services</a></li>
+                    <li class="nav-item"><a class="nav-link animate__animated animate__fadeInRight animate__delay-2s" href="#about">About</a></li>
+                    <li class="nav-item"><button class="btn btn-primary ms-2 register-btn animate__animated animate__fadeInRight animate__delay-3s" data-bs-toggle="modal" data-bs-target="#doctorModal">Join as Doctor</button></li>
+                    <li class="nav-item"><button class="btn btn-success ms-2 register-btn animate__animated animate__fadeInRight animate__delay-4s" data-bs-toggle="modal" data-bs-target="#boarderModal">Join as Boarder</button></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- Hero Section -->
+    <section id="home" class="hero text-center">
+        <div class="container">
+            <h1 class="animate__animated animate__fadeInDown">FureverCare: Your Pet's Best Friend</h1>
+            <p class="lead animate__animated animate__bounceIn mt-3">Providing exceptional care for your pets with trusted veterinarians and boarders.</p>
+            <a href="#features" class="btn btn-primary btn-lg mt-4 register-btn animate__animated animate__zoomIn">Discover More</a>
+        </div>
+    </section>
+    <!-- Features Section (Home Page) -->
+    <section id="features" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5" data-aos="fade-up">Why Choose FureverCare?</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4" data-aos="fade-right" data-aos-delay="100">
+                    <div class="card feature-card">
+                        <img src="https://images.unsplash.com/photo-1576201836106-db1758fd1c97?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="card-img-top" alt="Trusted Professionals">
+                        <div class="card-body">
+                            <h5 class="card-title">Trusted Professionals</h5>
+                            <p class="card-text">Connect with verified veterinarians and experienced pet boarders dedicated to your pet's well-being.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="card feature-card">
+                        <img src="assets/shallow-focus-vertical-shot-cute-golden-retriever-puppy-sitting-grass-ground.jpg" class="card-img-top" alt="Comprehensive Care">
+                        <div class="card-body">
+                            <h5 class="card-title">Comprehensive Care</h5>
+                            <p class="card-text">From medical consultations to grooming and boarding, we offer a full range of pet care services.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4" data-aos="fade-left" data-aos-delay="300">
+                    <div class="card feature-card">
+                        <img src="assets/WhatsApp Image 2025-06-05 at 3.36.28 PM.jpeg" class="card-img-top" alt="Easy Access">
+                        <div class="card-body">
+                            <h5 class="card-title">Easy Access</h5>
+                            <p class="card-text">Book appointments and find pet care solutions with our user-friendly platform, anytime, anywhere.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Testimonials Section (Home Page) -->
+    <section class="py-5 bg-light testimonial-section">
+        <div class="container">
+            <h2 class="text-center mb-5" data-aos="fade-up">What Pet Owners Say</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4" data-aos="zoom-in-up" data-aos-delay="100">
+                    <div class="card testimonial-card">
+                        <div class="card-body text-center">
+                            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80" class="rounded-circle mb-3" alt="Pet Owner" width="100">
+                            <p class="card-text">"FureverCare found me the perfect vet for my dog, Max. The service is reliable and so easy to use!"</p>
+                            <h6 class="card-title">Sarah M.</h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4" data-aos="zoom-in-up" data-aos-delay="200">
+                    <div class="card testimonial-card">
+                        <div class="card-body text-center">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80" class="rounded-circle mb-3" alt="Pet Owner" width="100">
+                            <p class="card-text">"The boarding service was a lifesaver during my trip. My cat was so well cared for!"</p>
+                            <h6 class="card-title">Kasun P.</h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4" data-aos="zoom-in-up" data-aos-delay="300">
+                    <div class="card testimonial-card">
+                        <div class="card-body text-center">
+                            <img src="assets/doctor-with-his-arms-crossed-white-background.jpg" class="rounded-circle mb-4" alt="Pet Owner" width="100">
+                            <p class="card-text">"Grooming with FureverCare left my puppy looking fabulous. Highly recommend!"</p>
+                            <h6 class="card-title">Dr.Tharindu R.</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Call to Action Section (Home Page) -->
+    <section class="cta-section">
+        <div class="container">
+            <h2 class="mb-4" data-aos="fade-up">Join Our Pet Care Community</h2>
+            <p class="lead" data-aos="fade-up" data-aos-delay="100">Whether you're a pet owner or a professional, FureverCare is here to make pet care seamless and rewarding.</p>
+            <div class="mt-4" data-aos="zoom-in" data-aos-delay="200">
+                <button class="btn btn-primary btn-lg me-3 register-btn">Join as Veterinarian</button>
+                <button class="btn btn-success btn-lg register-btn">Join as Boarder</button>
+            </div>
+        </div>
+    </section>
+    <!-- Services Section -->
+    <section id="services" class="py-5 services-section">
+        <div class="container">
+            <h2 class="text-center mb-5" data-aos="fade-up">Our Pet Care Services</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4" data-aos="fade-right" data-aos-delay="100">
+                    <div class="card service-card">
+                        <img src="https://images.unsplash.com/photo-1583512603805-3cc6b41f3edb?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="card-img-top" alt="Veterinary Services">
+                        <div class="card-body">
+                            <h5 class="card-title">Veterinary Consultations</h5>
+                            <p class="card-text">Expert veterinarians provide top-notch medical care for your pets, from routine checkups to specialized treatments.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="card service-card">
+                        <img src="assets/tran-mau-tri-tam--81lVsfM4gQ-unsplash.jpg" class="card-img-top" alt="Pet Boarding">
+                        <div class="card-body">
+                            <h5 class="card-title">Pet Boarding</h5>
+                            <p class="card-text">Safe, comfortable, and loving environments for your pets while you're away, with experienced caregivers.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4" data-aos="fade-left" data-aos-delay="300">
+                    <div class="card service-card">
+                        <img src="https://images.unsplash.com/photo-1560807707-8cc77767d783?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="card-img-top" alt="Grooming">
+                        <div class="card-body">
+                            <h5 class="card-title">Grooming & Wellness</h5>
+                            <p class="card-text">Professional grooming services to keep your pets looking and feeling their best, plus wellness programs.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+            <div class="col-md-4 mb-4" data-aos="fade-right" data-aos-delay="100">
+                    <div class="card service-card">
+                        <img src="assets/ja-san-miguel-_-QQuvAwQ-0-unsplash.jpg" class="card-img-top" alt="Veterinary Services">
+                        <div class="card-body">
+                            <h5 class="card-title">Location Tracking</h5>
+                            <p class="card-text">Our smart tracking system lets you know where your furry friend is at all times, giving you peace of mind whether they’re out for a walk, playing in the yard, or wandering too far from home</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="card service-card">
+                        <img src="assets/gayatri-malhotra-4EqIO_yxqoU-unsplash.jpg" class="card-img-top" alt="Pet Boarding">
+                        <div class="card-body">
+                            <h5 class="card-title">Nutrition Guidence</h5>
+                            <p class="card-text">Give your pet the care they deserve with personalized nutrition and guidance. From meal plans tailored to their age, breed, and health needs to expert tips on balanced diets, we help ensure your furry friend stays healthy, happy, and full of energy.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4" data-aos="fade-left" data-aos-delay="300">
+                    <div class="card service-card">
+                        <img src="assets/kevin-charit-Os-u1PKckFE-unsplash.jpg" class="card-img-top" alt="Grooming">
+                        <div class="card-body">
+                            <h5 class="card-title">Pet Shopping & Buying</h5>
+                            <p class="card-text">Find your perfect companion with ease. Explore a trusted marketplace for adopting or buying pets, complete with detailed profiles and guidance to help you bring home a healthy, happy new friend.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- About Section -->
+    <section id="about" class="py-5 about-section">
+        <div class="container">
+            <h2 class="text-center mb-5" data-aos="fade-up">About FureverCare</h2>
+            <div class="row align-items-center">
+                <div class="col-md-6" data-aos="fade-right" data-aos-delay="100">
+                    <img src="assets/DeWatermark.ai_1756028007808.jpeg" class="img-fluid rounded" alt="About FureverCare">
+                </div>
+                <div class="col-md-6" data-aos="fade-left" data-aos-delay="200">
+                    <p>FureverCare is your go-to platform for comprehensive pet care. We connect pet owners with trusted veterinarians and boarders, ensuring your furry friends receive the love and attention they deserve. Our mission is to make pet care accessible, reliable, and stress-free.</p>
+                    <p>Join our growing network of professionals and help us create a world where every pet is cared for like family.</p>
+                    <h5>Contact Info</h5>
+                    <p>Email: <a href="mailto:help.furevercare@gmail.com">help.furevercare@gmail.com</a></p>
+                    <p>Phone: (123) 456-7890</p>
+                    <p>Address: 123 Pet Street, Animal City, PC 12345</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Doctor Registration Modal -->
+    <div class="modal fade" id="doctorModal" tabindex="-1" aria-labelledby="doctorModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="doctorModalLabel">Register as a Veterinarian</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="doctorForm">
+                        <div class="mb-3">
+                            <label for="docName" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="docName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="docPhone" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="docPhone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="docFee" class="form-label">Fee ($)</label>
+                            <input type="number" class="form-control" id="docFee" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="docImage" class="form-label">Image URL</label>
+                            <input type="url" class="form-control" id="docImage" placeholder="https://example.com/image.jpg">
+                        </div>
+                        <div class="mb-3">
+                            <label for="docQual" class="form-label">Qualifications</label>
+                            <textarea class="form-control" id="docQual" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="docRating" class="form-label">Rating (0-5)</label>
+                            <input type="number" class="form-control" id="docRating" min="0" max="5" step="0.1" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Register</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Boarder Registration Modal -->
+    <div class="modal fade" id="boarderModal" tabindex="-1" aria-labelledby="boarderModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="boarderModalLabel">Register as a Pet Boarder</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="boarderForm">
+                        <div class="mb-3">
+                            <label for="boardName" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="boardName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="boardPhone" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="boardPhone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="boardFee" class="form-label">Fee ($)</label>
+                            <input type="number" class="form-control" id="boardFee" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="boardImage" class="form-label">Image URL</label>
+                            <input type="url" class="form-control" id="boardImage" placeholder="https://example.com/image.jpg">
+                        </div>
+                        <div class="mb-3">
+                            <label for="boardExp" class="form-label">Experience</label>
+                            <textarea class="form-control" id="boardExp" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="boardRating" class="form-label">Rating (0-5)</label>
+                            <input type="number" class="form-control" id="boardRating" min="0" max="5" step="0.1" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Register</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer -->
+    <footer class="footer text-center">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <h5>FureverCare</h5>
+                    <p>Your trusted partner in pet care services.</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#services">Services</a></li>
+                        <li><a href="#about">About</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5>Contact Info</h5>
+                    <p>Email: <a href="mailto:help.furevercare@gmail.com">help.furevercare@gmail.com</a></p>
+                    <p>Phone: (123) 456-7890</p>
+                </div>
+            </div>
+            <p class="mt-3">&copy; 2025 FureverCare. All rights reserved.</p>
+        </div>
+    </footer>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AOS JS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 1000,
+            once: true
+        });
+    </script>
+    <!-- Firebase Initialization and Form Handling -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+        import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+        // Replace with your actual Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyCgq7YFzKUgddn67U0evQpvR4UgWGdl7yI",
+            authDomain: "furevercare-db.firebaseapp.com",
+            projectId: "furevercare-db",
+            storageBucket: "furevercare-db.appspot.com",
+            messagingSenderId: "10696037465702",
+            appId: "1:1069603465702:android:844b4e67a95b9511294e2"
+        };
+
+        // Initialize Firebase
+        try {
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+            console.log("Firebase initialized successfully");
+            
+            // Doctor Form Submit
+            document.getElementById('doctorForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                try {
+                    const data = {
+                        name: document.getElementById('docName').value,
+                        phone: document.getElementById('docPhone').value,
+                        fee: parseFloat(document.getElementById('docFee').value),
+                        image: document.getElementById('docImage').value || "https://via.placeholder.com/150",
+                        qualifications: document.getElementById('docQual').value,
+                        rating: parseFloat(document.getElementById('docRating').value),
+                        timestamp: serverTimestamp()
+                    };
+                    await addDoc(collection(db, 'doctors'), data);
+                    console.log("Doctor data written to Firestore:", data);
+                    alert('Thank you for registering as a veterinarian!');
+                    bootstrap.Modal.getInstance(document.getElementById('doctorModal')).hide();
+                    document.getElementById('doctorForm').reset();
+                } catch (error) {
+                    console.error("Error writing doctor data:", error);
+                    alert('Error registering veterinarian: ' + error.message);
+                }
+            });
+
+            // Boarder Form Submit
+            document.getElementById('boarderForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                try {
+                    const data = {
+                        name: document.getElementById('boardName').value,
+                        phone: document.getElementById('boardPhone').value,
+                        fee: parseFloat(document.getElementById('boardFee').value),
+                        image: document.getElementById('boardImage').value || "https://via.placeholder.com/150",
+                        experience: document.getElementById('boardExp').value,
+                        rating: parseFloat(document.getElementById('boardRating').value),
+                        timestamp: serverTimestamp()
+                    };
+                    await addDoc(collection(db, 'boarders'), data);
+                    console.log("Boarder data written to Firestore:", data);
+                    alert('Thank you for registering as a pet boarder!');
+                    bootstrap.Modal.getInstance(document.getElementById('boarderModal')).hide();
+                    document.getElementById('boarderForm').reset();
+                } catch (error) {
+                    console.error("Error writing boarder data:", error);
+                    alert('Error registering boarder: ' + error.message);
+                }
+            });
+        } catch (error) {
+            console.error("Firebase initialization failed:", error);
+            alert("Failed to initialize Firebase: " + error.message);
+        }
+    </script>
+</body>
+</html>
